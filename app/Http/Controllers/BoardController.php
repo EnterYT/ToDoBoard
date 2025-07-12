@@ -12,11 +12,8 @@ class BoardController extends Controller
      */
     public function index()
     {
-        $boards = auth()->user()->boards()->latest()->get();
-
-        return Inertia::render('Boards/Index', [
-            'boards' => $boards
-        ]);
+        $boards = Board::where('user_id', auth()->id())->latest()->get();
+        return view('boards.index', compact('boards'));
     }
 
     /**
@@ -24,15 +21,20 @@ class BoardController extends Controller
      */
     public function create()
     {
-        //
+        return view('boards.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $validated['user_id'] = auth()->id();
+
+        Board::create($validated);
+
+        return redirect()->route('boards.index')->with('success', 'Board created!');
     }
 
     /**
@@ -46,24 +48,29 @@ class BoardController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Board $board)
     {
-        //
+        return view('boards.edit', compact('board'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Board $board)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $board->update($validated);
+
+        return redirect()->route('boards.index')->with('success', 'Board updated!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Board $board)
     {
-        //
+        $board->delete();
+
+        return redirect()->route('boards.index')->with('success', 'Board deleted!');
     }
 }

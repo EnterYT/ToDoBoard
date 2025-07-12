@@ -9,7 +9,7 @@ class Board extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'owner_id'];
+    protected $fillable = ['name', 'user_id'];
 
     public function owner()
     {
